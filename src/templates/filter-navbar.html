@@ -1,0 +1,217 @@
+<header class="listings-navbar" style="border: none;">
+  <nav class="navbar navbar-expand-sm" style="width: 100%; border: none;">
+    <div class="container-fluid ps-2 pe-2">
+      <!-- collapse button -->
+      <div class="collapse navbar-collapse" id="filterNavBar">
+        <!-- ms-auto text-center -->
+        <div class="nav navbar-nav btn-group ">
+          <div class="nav-item inline-block" >
+            <div class="dropdown">
+              <button
+                class="btn btn-light-shadow ripple-btn btn-secondary dropbtn heather-button dropdown-toggle me-2 mt-1 mb-1"
+                href="#"
+                role="button"
+                id="dropdownCategory"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false" >
+                Category
+              </button>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="dropdownSubcategory">
+                <div class="nav-filter-checkbtn">
+                  <div class="form-check">
+                    <input type="radio" value="{{default_category}}" class="form-check-input" name=categoryfilter id="filterC-{{default_category}}">
+                    <label class="form-check-label dropdown-text"
+                          for="filterC-{{default_category}}">
+                          {{default_category.capitalize()}}</label><br>
+                  </div>
+                </div>
+                
+                {%for category in constants.categories %}
+                <div class="nav-filter-checkbtn">
+                  <div class="form-check">
+                    <input type="radio" value="{{category.value}}" class="form-check-input" name=categoryfilter id="filterC-{{category.value}}">
+                    <label class="form-check-label dropdown-text"  for="filterC-{{category.value}}">{{category.value.capitalize()}}</label><br>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+    
+          <div class="nav-item inline-block">
+            <div class="dropdown show">
+              <button
+                class="btn btn-light-shadow ripple-btn btn-secondary dropbtn heather-button dropdown-toggle me-2 mt-1 mb-1"
+                href="#"
+                role="button"
+                id="dropdownSubcategory"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                Subcategory
+              </button>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="dropdownSubcategory">
+                {%for subcategory in constants.subcategories %}
+                <div class="nav-filter-checkbtn">
+                  <div class="form-check">
+                    <input type="checkbox" value="{{subcategory.value}}" class="form-check-input" name=subcategoryfilter id="filterSub-{{subcategory.value}}">
+                    <label class="form-check-label dropdown-text"  for="filterSub-{{subcategory.value}}">{{subcategory.value.capitalize()}}</label><br>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+
+          <div class="nav-item inline-block">
+            <div class="dropdown show">
+              <button
+                class="btn btn-light-shadow ripple-btn btn-secondary ripple dropbtn heather-button dropdown-toggle me-2 mt-1 mb-1"
+                href="#"
+                role="button"
+                id="dropdownSizes"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                Size
+              </button>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="dropdownSizes">
+                {%for size in constants.regular_sizes %}
+                <div class="nav-filter-checkbtn">
+                  <div class="form-check">
+                    <input type="checkbox" value="{{size.value}}" class="form-check-input" name=sizefilter id="filterSize-{{size.value}}">
+                    <label class="form-check-label dropdown-text"  for="filterSize-{{size.value}}">{{size.value}}</label><br>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-item"style="display: inline; width: auto;">
+            <div class="dropdown show">
+              <button
+                class="btn btn-light-shadow ripple-btn btn-secondary dropbtn heather-button dropdown-toggle me-2 mt-1 mb-1"
+                href="#"
+                role="button"
+                id="dropdownPriceRange"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                Price
+              </button>
+              <div class="dropdown-menu dropdown-content container-fluid pricerange-dropdown" aria-labelledby="dropdownPriceRange">
+                <form action="" id="priceRangeForm">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="minprice">Min price</label>
+                      <input type="number" class="form-control mb-3 pl-3" id="minPrice" value="{{default_min_price}}" aria-describedby="minPrice" placeholder="Min price">
+                    </div>
+                    <div class="form-group">
+                      <label for="maxprice">Max price</label>
+                      <input type="number" class="form-control mb-3 pl-3" id="maxPrice" value="{{default_max_price}}" placeholder="Max price">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <button type="submit" id="priceRangeSubmit" class="btn mb-3 pl-3 pricerange-submit">Go</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-item"style="display: inline; width: auto;">
+            <div class="dropdown show">
+              <button
+                class="btn btn-light-shadow ripple-btn btn-secondary dropbtn heather-button dropdown-toggle me-2 mt-1 mb-1"
+                href="#"
+                role="button"
+                id="dropdownPriceRange"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                Sort
+              </button>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="dropdownSort">
+                {%for sort in constants.sortings %}
+                <div class="nav-filter-checkbtn">
+                  <div class="form-check">
+                    <input type="radio" value="{{sort.value}}" class="form-check-input" name=sortfilter id="filter-{{sort.value}}">
+                    <label class="form-check-label dropdown-text"  for="filter-{{sort.value}}">{{sort.value}}</label><br>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="nav-item" style="float: inline-end;">
+        <form action="">
+          <div class="row justify-content-end"
+           style="box-sizing: border-box;">
+              <input class="searchBar
+              nav-filter-search ms-3 me-2 mt-1 mb-1" 
+              id="searchBar" type="text" placeholder="Search" 
+              aria-label="Search" style="height: 44px;">
+              
+              <button class="btn btn-light-shadow btn-secondary me-2 mt-1 mb-1" 
+              id="searchSubmit" style="display: inline-block;" type="submit"
+             >Go
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+
+
+      <!-- collapse button filler -->
+      <button
+        class="btn btn-secondary mt-1 mb-1 d-block d-sm-none"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#filterNavBar"
+        aria-controls="nav-items-dropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        Filters
+      </button>
+      <!-- end of collapse button filler -->
+    </div>
+  </nav>
+  </div>  
+</header>
+
+<script>
+ function createRipple(event) {
+  const button = event.currentTarget;
+
+  const circle = document.createElement("span");
+  const diameter = Math.max(button.clientWidth, button.clientHeight);
+  const radius = diameter / 2;
+
+  circle.style.width = circle.style.height = `${diameter}px`;
+  circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+  circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+  circle.classList.add("ripple");
+
+  const ripple = button.getElementsByClassName("ripple")[0];
+
+  if (ripple) {
+    ripple.remove();
+  }
+
+  button.appendChild(circle);
+}
+
+const buttons = document.getElementsByClassName("ripple-btn")
+for (const button of buttons) {
+  button.addEventListener("mousedown", createRipple);
+}
+</script>

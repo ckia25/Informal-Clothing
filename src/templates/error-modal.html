@@ -1,0 +1,26 @@
+<div
+  class="modal fade"
+  id="errorModel"
+  tabindex="-1"
+  aria-labelledby="modalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+      <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bi bi-x-circle-fill"></i>
+        <!-- INVALID LISTINGFORM -->
+        {% if modal == constants.ErrorModals.INVALID_INPUT_LISTINGFORM.value %}
+        <div class="ms-3">{{constants.ErrorModals.INVALID_LISTINGFORM_MESSAGE.value}}.</div>
+        <!-- INVALID EDIT LISTING FOR< -->
+        {% elif modal == constants.Modals.EDIT_LISTING_FAILURE.value %}
+        <div class="ms-3">{{constants.Modals.INVALID_EDIT_MESSAGE.value}}.</div>
+        <!-- INVALID EDIT PROFILE -->
+        {% elif modal == constants.Modals.EDIT_PROFILE_FAILURE.value %}
+        <div class="ms-3">{{constants.Modals.EDIT_PROFILE_FAILURE_MESSAGE.value}}.</div>
+        
+        {% else %}
+        <div class="ms-3">Error</div>
+        {% endif %}
+      </div>
+    </div>
+</div>

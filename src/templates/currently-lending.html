@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lend - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+
+  <body>
+    {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+    include 'guest-header.html' %} {% endif %}
+    <!-- set both left and right margins to 5.5% -->
+    <div class="standard-div-margins
+    ms-2 ms-sm-5
+    me-2 me-sm-5" >
+      <!-- page title div -->
+      <div class="mt-3
+        mb-md-2 mb-sm-0
+        ms-sm-0 ms-3
+        me-sm-0 me-3">
+        <h1>Lend</h1>
+        <hr />
+        {% if listings == [] %}
+        <h4>No pending rental requests, yet! Try posting another <a href="/listingform"> <u>listing</u></a>
+          to get started!</h4>
+        {% endif %}
+      </div>
+      <div class="justify-content-center">
+      <!-- listings div -->
+      <div class="row h-100 g-4 me-1 me-sm-0 ms-1 ms-sm-0
+      justify-content-between container-fluid
+      row-cols-xxl-3 row-cols-xl-3 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1">
+        {% for i, listing in enumerate(listings) %}
+        {% if listing.get_transaction().get_status() != Status.ON_THE_MARKET.value %}
+        <div class="row lending-and-borrowing-width
+          mt-4 mt-3-sm
+          ms-1 ms-sm-1
+          me-1 me-sm-1 container-fluid">
+          <div class="lending-card rounded-4 shadow-lg container-fluid">
+            <!-- top row of card -->
+            <div class="row flex-wrap
+            ps-1
+            pt-2
+            pe-1">
+              <!-- name of listing -->
+              <div class="col align-text-bottom"
+              style="text-align: left; font-size: 1.25rem;">
+                <div style="font-weight: bolder">Title:
+                </div>
+                <div class="text-info-emphasis" style="font-weight: bolder">
+                  {{listing.get_name()}}
+                </div>
+              </div>
+              <!-- status -->
+              <div class="col" style="text-align: right; font-size: 1.25rem;">
+                <div style="font-weight: bolder">Status:
+                </div>
+                <div class="lending-and-borrowing-textspecial">
+                  {{listing.get_transaction().get_status()}}
+                </div>
+              </div>
+              <hr class="mb-3 mt-2" style="color: rgb(181, 180, 180);" />
+            </div>
+
+            <!-- row with image and text -->
+            <div class="container-fluid">
+              <div class="row mt-1 mt-md-0 align-items-center" >
+                <div class="col-sm text-center text-sm-start text-md-center text-lg-center text-xl-start
+                  order-last order-sm-first order-md-last" style="min-width: 160px;">
+                  <div class="lending-small-font">
+                    <!-- requested -->
+                    {% if listing.get_transaction().get_status() == Status.REQUESTED.value %}
+                    <a class="lending-name btn-link"
+                      style="text-transform: capitalize"
+                      href="/profile/{{listing.get_transaction().get_borrower_username()}}"
+                    >
+                    {{listing.get_transaction().get_borrower_username()}}
+                    </a>
+                    has requested to borrow
+                    <span class="lending-listing">"{{listing.get_name()}}"</span> from:
+                    <br class="d-none d-sm-block d-md-block d-lg-none d-xl-block d-xxl-block">
+                    <br>
+                    <span class="lending-date-one">{{listing.get_transaction().get_date_lent_out()}}</span>
+                    to
+                    <span class="lending-date-one">{{listing.get_transaction().get_date_returned()}}</span>.
+                    {% endif %}
+
+                    <!-- request accepted -->
+                    {% if listing.get_transaction().get_status() == Status.REQUEST_ACCEPTED.value %}
+                    You approved
+                    <a class="lending-name btn-link"
+                      href="/profile/{{listing.get_transaction().get_borrower_username()}}"
+                    >
+                    {{listing.get_transaction().get_borrower_username()}}
+                    </a>'s
+                    request to borrow
+                    <span class="lending-listing">"{{listing.get_name()}}"</span>
+                    {% include 'resizing-spacer.html' %}
+                    from:
+                    <span class="lending-date-one">{{listing.get_transaction().get_date_lent_out()}}</span>
+                    to
+                    <span class="lending-date-two">{{listing.get_transaction().get_date_returned()}}</span>.
+                    {% include 'resizing-spacer.html' %}
+                    Time to exchange!
+                    {% endif %}
+
+
+                    <!-- borrower has possession -->
+                    {% if listing.get_transaction().get_status() == Status.BORROWER_HAS_POSSESSION.value %}
+                    <a class="lending-name btn-link"
+                      style="text-transform: capitalize"
+                      href="/profile/{{listing.get_transaction().get_borrower_username()}}"
+                    >
+                    {{listing.get_transaction().get_borrower_username()}}
+                    </a>
+                    will have
+                    <span class="lending-listing">"{{listing.get_name()}}"</span>
+                    {% include 'resizing-spacer.html' %}
+                    until
+                    <span class="lending-date-two">{{listing.get_transaction().get_date_returned()}}</span>
+                    !
+                    {% endif %}
+
+                    <!-- overdue -->
+                    {% if listing.get_transaction().get_status() == Status.OVERDUE.value %}
+                    <span class="lending-listing">"{{listing.get_name()}}"</span>
+                    was supposed to be returned on
+                    <span class="lending-date-two">{{listing.get_transaction().get_date_returned()}}</span>
+                    , but is now overdue!
+                    <br>
+                    <br>
+                    Please check in with
+                    <a class="lending-name btn-link"
+                      href="/profile/{{listing.get_transaction().get_borrower_username()}}"
+                    >
+                    {{listing.get_transaction().get_borrower_username()}}
+                    </a>.
+                    {% endif %}
+
+                    <!-- returned -->
+                    {% if listing.get_transaction().get_status() == Status.RETURNED.value %}
+                    <a class="lending-name btn-link"
+                      style="text-transform: capitalize"
+                      href="/profile/{{listing.get_transaction().get_borrower_username()}}"
+                    >
+                    {{listing.get_transaction().get_borrower_username()}}
+                    </a> has returned
+                    <span class="lending-listing">"{{listing.get_name()}}"</span>!
+                    {% include 'resizing-spacer.html' %}
+                    Please rate your experience with them!
+                    {% endif %}
+
+                    {% if listing.get_transaction().get_status() == Status.EARLY_RETURN.value %}
+                    Once the borrower confirms, this item will no longer appear in your actively lending tab.
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col text-center text-sm-end text-md-center
+                order-first order-sm-last order-md-first">
+                  <img
+                    class="img-fluid lending-and-borrowing-img
+                    rounded-4 mb-3 mb-sm-0 mb-md-2 mb-lg-0"
+                    src="{{listing.get_images()[0].get_img_url()}}"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- line break two -->
+            <hr class="" style="color: rgb(181, 180, 180);" />
+
+
+            <div class="row mt-1 mt-md-0 align-items-center" >
+              <div class="col-sm  text-center
+              order-last order-sm-first order-md-last" >
+                <div class="lending-small-font" style="width: 100%; word-wrap: break-word;">
+                  Their message: <span class="fst-italic">"{{listing.get_transaction().get_request_msg()}}"</span>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- line break two -->
+            <hr class="mb-0" style="color: rgb(181, 180, 180);" />
+            <!-- button row -->
+            <div class="row flex-wrap lending-button-font text-nowrap
+              pt-3 pt-sm-2
+              pb-3 pb-sm-2
+              ps-1 pe-1">
+              <!-- contact button -->
+              <div class="col pb-1 pb-md-1 pb-lg-2 pb-xl-2 lending-left-button">
+                <button type="button"
+                class="btn btn-secondary green-background lending-left-button"
+                data-bs-toggle="modal"
+                data-bs-target="#contactModal{{listing.get_transaction().get_id()}}"
+                >
+                  Contact Borrower
+                </button>
+                <!-- contact button modal -->
+                <div class="modal fade"
+                  id="contactModal{{listing.get_transaction().get_id()}}"
+                  tabindex="-1"
+                  aria-labelledby="contactModalLabel"
+                  aria-hidden="true"
+                  style="z-index: 2500"
+                >
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Contact Info</h1>
+                      </div>
+                      <div class="m-3 row">
+                        <span style="font-weight: bolder">Borrower:
+                          <a class="btn-link" href="{{ url_for('profile', user_requested=listing.get_transaction().get_borrower_username()) }}">
+                            {{listing.get_transaction().get_borrower_username()}}
+                          </a>
+                        </span>
+                        </div>
+                      <div class="m-3 row">
+                        <span style="font-weight: bolder">Email:
+                        <a class="btn-link" href="mailto:{{listing.get_transaction().get_borrower_username()}}@princeton.edu">
+                          {{listing.get_transaction().get_borrower_username()}}@princeton.edu
+                        </a>
+                      </span>
+                      </div>
+                      {% if listing.get_transaction().get_other_phone_number() is not none %}
+                      <div class="m-3 row">
+                        <span style="font-weight: bolder">Phone number: {{listing.get_transaction().get_other_phone_number()}}</span>
+                      </div>
+                      {% endif %}
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- action buttons -->
+              <div class="col my-auto pb-1 pb-md-1 pb-lg-2 pb-xl-2 lending-right-button">
+                <!-- remove a listing -->
+                <!-- requested -->
+                {% if listing.get_transaction().get_status() == Status.REQUESTED.value %}
+                <!-- accept rental request -->
+                <div class="btn-group align-items-center" role="group" style="text-align: end;">
+                  <!-- reject rental request -->
+                  <div>
+                    <button type="button"
+                    class="btn btn-secondary grey"
+                    data-bs-toggle="modal"
+                    data-bs-target="#rejectModal{{listing.get_transaction().get_id()}}"
+                    >
+                      Reject
+                    </button>
+                    <!-- Button trigger modal -->
+                    <div class="modal fade"
+                          id="rejectModal{{listing.get_transaction().get_id()}}"
+                          tabindex="-1"
+                          aria-labelledby="rejectModalLabel"
+                          aria-hidden="true"
+                          style="z-index: 2500"
+                        >
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Are you sure?</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body text-start ">
+                            Rejecting {{listing.get_transaction().get_borrower_username()}}'s request cannot be reversed.
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            <!-- NEED TO CHANGE THIS SO IT ACTUALLY WORKS -->
+                            <form id="reject-request-form" action="{{'/lending/reject?listingid=%s&tid=%s' %
+                                (listing.get_id(), listing.get_transaction().get_id())}}"
+                                method="post" enctype="multipart/form-data" novalidate>
+                              <button id="reject{{listing.get_transaction().get_id()}}" type="submit" class="btn btn-secondary" style="background-color:rgb(146, 49, 49)" onclick="disableBtn('reject{{listing.get_transaction().get_id()}}'); document.getElementById('reject-request-form').submit()" >
+                                Reject Request
+                              </button>
+                              <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                              <input type="hidden" name="date"/>
+                            </form>
+                            <!--
+                            <form id="rejected-request-form" action="/BRUH"
+                                              method="post" enctype="multipart/form-data" novalidate>
+                              <button type="button" class="btn btn-secondary" style="background-color:rgb(146, 49, 49)">
+                                Reject Request
+                              </button>
+                            </form>
+                            -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button type="button"
+                    class="btn btn-secondary green-btn ms-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#acceptModal{{listing.get_transaction().get_id()}}"
+                    >
+                      Accept
+                    </button>
+                    <!-- Button trigger modal -->
+                    <div class="modal fade"
+                          id="acceptModal{{listing.get_transaction().get_id()}}"
+                          tabindex="-1"
+                          aria-labelledby="acceptModalLabel"
+                          aria-hidden="true"
+                          style="z-index: 2500"
+                        >
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Are you sure?</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" style="text-align: left; vertical-align: center;">
+                            Accepting {{listing.get_transaction().get_borrower_username()}}'s request
+                            <span class="text-decoration-underline">cannot be reversed</span> and
+                            <br>
+                            commits you to:
+                             <ul style=" text-align: left; vertical-align: center;">
+                              <li class="mt-2">
+                                {% include 'exclamation.svg' %}
+                                Communicating with {{listing.get_transaction().get_borrower_username()}}</li>
+                              <li>
+                                {% include 'exclamation.svg' %}
+                                Promptly exchanging <span class="lending-name btn-link" style="text-transform: capitalize;"
+                                >"{{listing.get_name()}}"</span></li>
+                              <li>
+                                {% include 'exclamation.svg' %}
+                                Conducting yourself well!</li>
+                             </ul>
+                             <input type="checkbox" onclick="switchState('approve{{listing.get_transaction().get_id()}}')" id="verify" name="verify">
+                             <label class="align-text-center" for="verify">I accept these terms.</label>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                            <form id="accepted-request-form" action="{{'/lending/status?listingid=%s&tid=%s' %
+                                (listing.get_id(), listing.get_transaction().get_id())}}"
+                                method="post" enctype="multipart/form-data" novalidate>
+                              <button id="approve{{listing.get_transaction().get_id()}}" onclick="disableBtn('approve{{listing.get_transaction().get_id()}}'); document.getElementById('accepted-request-form').submit()" type="submit" class="btn btn-secondary green-background disabled">
+                              Approve Request
+                              </button>
+                              <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                              <input type="hidden" name="date"/>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% elif listing.get_transaction().get_status() == Status.REQUEST_ACCEPTED.value %}
+                <span class="text-wrap text-decoration-underline lending-right-button fw-bolder">
+                  We will notify you when the borrower confirms that they received their
+                  item.
+                </span>
+                <!-- borrower has possession -->
+                {% elif listing.get_transaction().get_status() == Status.BORROWER_HAS_POSSESSION.value %}
+                <div>
+                  <button type="button"
+                  class="btn btn-secondary green-btn ms-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#earlyReturnModal{{listing.get_transaction().get_id()}}"
+                  >
+                    Confirm Early Return
+                  </button>
+                  <!-- Early return modal -->
+                  <div class="modal fade"
+                        id="earlyReturnModal{{listing.get_transaction().get_id()}}"
+                        tabindex="-1"
+                        aria-hidden="true"
+                        style="z-index: 2500"
+                      >
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5 fw-bold" id="earlyReturnModalLabel">Are you sure?</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          This confirmation cannot be reversed.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                          <form id="item-returned-form" action="{{'/ratelender?listingid=%s&user=%s&tid=%s&early=True' %
+                          (listing.get_id(), listing.get_transaction().get_borrower_username(), listing.get_transaction().get_id())}}"
+                          method="post" enctype="multipart/form-data" novalidate>
+                          <button id="confirm{{listing.get_transaction().get_id()}}" onclick="disableBtn('confirm{{listing.get_transaction().get_id()}}'); document.getElementById('item-returned-form').submit()" type="submit" class="btn btn-secondary green-btn ms-2">
+                            Confirm Return
+                            </button>
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="date"/>
+                            <input type="hidden" id="lender_user_id" name="lender_user_id" value="{{listing.get_user_id()}}"/>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% elif listing.get_transaction().get_status() == Status.RETURNED.value %}
+                <form id="rate-borrower-form" action="{{'/ratelender?listingid=%s&user=%s&tid=%s' %
+                (listing.get_id(), listing.get_transaction().get_borrower_username(), listing.get_transaction().get_id())}}"
+                method="post" enctype="multipart/form-data" novalidate>
+                  <button id="rate{{listing.get_transaction().get_id()}}" type="submit" class="btn btn-secondary green-btn ms-2">
+                    Rate borrower
+                  </button>
+                  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                  <input type="hidden" name="date"/>
+                  <input type="hidden" id="lender_user_id" name="lender_user_id" value="{{listing.get_user_id()}}"/>
+                </form>
+                {% elif listing.get_transaction().get_status() ==  Status.NEVER_RETURNED.value %}
+                <!-- DOES THIS WORK -->
+                <a href="#">
+                  <button
+                    class="btn btn-secondary green-btn ms-2"
+                    style="color: red"
+                  >
+                    Overdue
+                  </button>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      </div>
+    </div>
+    {% include 'listing-button.html' %}
+  </body>
+</html>
+
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+<script>
+
+  $(document).ready(() => {
+    // reload page if coming from history (like back button)
+    window.addEventListener( "pageshow", function ( event ) {
+    const historyTraversal = event.persisted ||
+                         ( typeof window.performance != "undefined" &&
+                              window.performance.navigation.type === 2 );
+    if (historyTraversal) {
+      // Handle page restore.
+      window.location.reload();
+    }});
+
+    let today = new Date();
+    const offset = today.getTimezoneOffset();
+    today = new Date(today.getTime() - offset * 60 * 1000);
+    today = today.toISOString().split("T")[0];
+
+    $('input[name="date"]').val(today);
+  })
+
+  function disableBtn(id) {
+    const element = document.getElementById(id);
+    element.disabled = true;
+    element.classList.add("disabled");
+  }
+
+  function switchState(id) {
+    const element = document.getElementById(id)
+    if (element.classList.contains("disabled")) {
+      element.classList.remove("disabled")
+    }
+    else {
+      element.classList.add("disabled")
+    }
+  }
+</script>

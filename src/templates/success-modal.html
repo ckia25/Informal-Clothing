@@ -1,0 +1,18 @@
+<div
+  class="modal fade"
+  id="successModel"
+  tabindex="-1"
+  aria-labelledby="modalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+      <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="bi bi-check-circle-fill"></i>
+        {% if modal == constants.Modals.EDIT_LISTING_SUCCESS.value %}
+        <div class="ms-3">{{constants.Modals.SUCCESS_EDIT_MESSAGE.value}}.</div>
+        {% elif modal == constants.Modals.EDIT_PROFILE_SUCCESS.value %}
+        <div class="ms-3">{{constants.Modals.EDIT_PROFILE_SUCCESS_MESSAGE.value}}.</div>
+        {% endif %}
+      </div>
+    </div>
+</div>

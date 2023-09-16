@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Listing - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <!-- Bad date modal -->
+    <div class="modal fade" id="badDateModal" aria-labelledby="badDateModal" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="alert alert-danger" role="alert" id="alertMessage"></div>
+      </div>
+    </div>
+    {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+    include 'guest-header.html' %} {% endif %}
+    <form
+      multiSelect
+      id="listing-form"
+      class="needs-validation"
+      action="/listingform/submit"
+      method="post"
+      enctype="multipart/form-data"
+      novalidate
+    >
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+      <div class="col container-fluid w-75">
+        <h1 class="mt-4">Listing Post Form</h1>
+      </div>
+      <hr />
+      <div class="container w-75">
+        <div class="row">
+          <!-- item name -->
+          <div class="col mb-3">
+            <label for="itemName" class="form-label fw-bold">Item Name*</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              id="itemName"
+              aria-describedby="itemName"
+              maxlength="{{constants.inputLimits.TITLE_LIMIT.value}}"
+              required
+            />
+            <div class="invalid-feedback">Please provide an item name.</div>
+          </div>
+          <!-- blackout dates -->
+          <div class="col mb-3">
+            <div class="row">
+              <div class="col">
+                <label for="blackoutDates" class="form-label"
+                  >Blackout Dates</label
+                >
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col mb-2 mb-lg-0">
+                <button
+                  id="add-calendar-btn"
+                  class="ps-4 pe-4 pt-1 pb-1 main-color-background btn mb-3"
+                  type="button"
+                >
+                  Add more dates
+                </button>
+              </div>
+              <div id="remove-placeholder" class="col mb-2"></div>
+            </div>
+            <span id="additional-dates-container"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-3">
+            <!-- category -->
+            <div>
+              <label class="fw-bold">Category*</label>
+              {% for category in constants.categories%}
+              <div class="form-check ms-4">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="category"
+                  value="{{category.value}}"
+                  id="flexCheck{{category.value.capitalize()}}"
+                  required
+                />
+                <label
+                  class="form-check-label"
+                  for="flexCheck{{category.value.capitalize()}}"
+                >
+                  {{category.value.capitalize()}}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="invalid-feedback">Please select a category.</div>
+            <div class="mt-3">
+              <label for="subcategory" class="form-label fw-bold">Subcategory*</label>
+              <select
+                name="subcategory"
+                class="form-select"
+                aria-label="Select size"
+                required
+              >
+                <option value="" disabled selected>Select</option>
+                {% for subcategory in constants.subcategories%}
+                <option value="{{subcategory.value}}">
+                  {{subcategory.value.capitalize()}}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">Please select a subcategory.</div>
+            </div>
+            <div class="mt-3">
+              <div id="maxFiles"></div>
+              <label for="size" class="form-label fw-bold">Size*</label>
+              <select
+                class="form-select"
+                aria-label="Select size"
+                name="size"
+                required
+              >
+                <option value="" disabled selected>Select</option>
+                {% for size in constants.regular_sizes %}
+                <option value="{{size.value}}">{{size.value}}</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">Please provide a size.</div>
+            </div>
+
+          </div>
+          <div class="col mb-3">
+            <div>
+              <span                 
+              data-bs-toggle="popover"
+              data-bs-trigger="hover focus"
+              tabindex="0"
+              class="fw-bold"
+              data-bs-content="Click for pricing suggestions!">
+                <button class=" naked bg-transparent"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#priceModal">
+                  <label for="price" class="form-label fw-bold">Price (points/day)* &nbsp<i class="bi bi-question-circle-fill"></i></label>
+                </button>
+              </span>
+              <div class="modal fade"
+                id="priceModal"
+                tabindex="-1"
+                aria-labelledby="priceModal"
+                aria-hidden="true"
+                style="z-index: 2500"
+              >
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Recommended Pricing</h1>
+                    </div>
+                    <table class="table table-striped mb-0 ms-3 me-3" style="width: auto;">
+                      <thead>
+                        <tr class="fw-bold">
+                          <th scope="col fw-bold" style="font-weight: bold;">Type</th>
+                          <th scope="col fw-bold" style="font-weight: bold;">Price (pts/day)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">Dresses</th>
+                          <td>80-100</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Shoes</th>
+                          <td>70-90</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Jacket</th>
+                          <td>60-80</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Sweater</th>
+                          <td>60-80</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Pants</th>
+                          <td>50-70</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Bottoms</th>
+                          <td>50-70</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Tops</th>
+                          <td>40-60</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Sweatshirt</th>
+                          <td>40-60</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Shirt</th>
+                          <td>30-50</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Shorts</th>
+                          <td>30-50</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <br>
+                    <div class="ms-5 me-5">
+                      Questions about the point system? Read up on it <a class="link-secondary text-decoration-underline" href="/faq#pointsection">here</a>.
+                    </div>
+                    <br>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input
+                type="number"
+                name="price"
+                class="form-control"
+                id="inputItemName"
+                aria-describedby="itemName"
+                max="{{constants.defaults.MAX_PRICE.value}}"
+                min="{{constants.defaults.MIN_PRICE.value}}"
+                required
+              />
+              <div class="invalid-feedback">Please provide a whole number less than 100,000.</div>
+            </div>
+            <label for="description" class="form-label mt-3"
+              >Short Description</label
+            >
+            <textarea
+              type="text"
+              name="description"
+              class="form-control"
+              id="inputDesc"
+              aria-describedby="inputDesc"
+              style="height: 180px;"
+              maxlength="{{constants.inputLimits.DESCRIPTION_LIMIT.value}}"
+            ></textarea>
+            <div class="float-end" style="color: grey" id="charCount">0/300</div>
+          </div>
+        </div>
+
+
+        <div class="row">
+          <!-- primary image -->
+          <div class="col mb-3">
+            <label for="primaryImage" class="form-label fw-bold">Primary Image*</label>
+            <input
+              type="file"
+              name="primaryImage"
+              class="form-control"
+              id="primaryImageFile"
+              accept="image/*"
+              required
+            />
+            <div class="invalid-feedback">Please provide a primary image.</div>
+          </div>
+          <!-- additional images -->
+          <div class="col mb-3">
+            <label for="additionalImages" class="form-label"
+              >Additional Images (First 5 accepted)</label
+            >
+            <input
+              type="file"
+              name="additionalImages[]"
+              class="form-control"
+              id="additionalImages"
+              accept="image/*"
+              multiple
+            />
+            <div id="filenames"></div>
+            <div id="additionalUploads"></div>
+          </div>
+
+        </div>
+        <div id="imageRow" class="row d-none">
+          <div class="col mb-3 text-center">
+            <br>
+            <img id="imagePrimary" class="img-fluid rounded-3 listing-form-img" alt="" style="object-fit: cover;">
+
+            <div class="text-center fst-italic">
+              <br>
+              This is how your primary image will be displayed!
+            </div>
+          </div>
+          <div class="col mb-3 text-center">
+            <br>
+            <img id="imageSecondary" class="rounded-3 img-fluid listing-form-img" alt="" style="object-fit: cover;">
+            <div class="text-center fst-italic">
+              <br>
+              This is how your secondary images will be displayed!
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <hr />
+      <input type="hidden" id="listingDateCreated" name="listingDateCreated" />
+      <div class="float-end me-5 mb-4">
+        <button type="submit" id="submitButton" class="btn btn-secondary green-background"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+    <div class="float-end me-2 mb-4">
+      <a class="btn btn-secondary heather-button" type="button"
+       href="#" onclick="location.href = document.referrer; return false;"> Cancel
+      </a>
+    </div>
+    <div id=spinner class="float-end mb-4 me-2"></div>
+    {% if modal == constants.ErrorModals.INVALID_INPUT_LISTINGFORM.value %} {%
+    include 'error-modal.html' %} {% endif %}
+  </body>
+</html>
+
+<!-- Include Required Prerequisites -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+></script>
+<!-- Include Date Range Picker -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"
+></script>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css"
+/>
+
+<script>
+  "use strict";
+
+  $(document).ready(function () {
+
+    $('[data-toggle="tooltip"]').tooltip()
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+
+    
+    let calendarInd = 0;
+    const today = new Date();
+    let dayBeforeToday = today;
+    dayBeforeToday.setDate(dayBeforeToday.getDate() - 1);
+
+    // create new calendar on button click
+    $("#add-calendar-btn").click(function () {
+      const newDatePicker = `<div id=blackoutDate${calendarInd}Container class="row mb-2">
+                             <div class="col"></div>
+                             <div class="col">
+                              <input
+                              style="width: 225px; min-width: 150px; cursor: pointer;"
+                              type="text"
+                              name="blackoutDate${calendarInd}"
+                              class="form-control"
+                              id="blackoutDate${calendarInd}"
+                              />
+                             </div>
+                            </div>`;
+
+      $("#additional-dates-container").append(newDatePicker);
+
+      // hook up functionality to new calendar
+      $(function () {
+        $(`input[name="blackoutDate${calendarInd}"]`).daterangepicker({
+          startDate: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+          isInvalidDate: function (date) {
+            const calendarDate = new Date(date);
+            if (calendarDate < dayBeforeToday) {
+                return true;
+            }
+          },
+        });
+      });
+
+      // ERROR HANDLING FOR INVALID BLACKOUT DATES (WIP)
+
+      $(`#blackoutDate${calendarInd}`).on('apply.daterangepicker hide.daterangepicker', function(ev, picker) {
+        if (picker.startDate < dayBeforeToday | picker.endDate < dayBeforeToday) {
+          const badDateModal = new bootstrap.Modal("#badDateModal");
+          $('#alertMessage').html('Please select valid blackout dates.')
+          badDateModal.show();
+          $(this).val('');
+        }
+      });
+
+      if ($("#remove-placeholder").children().length == 0) {
+        const removeBtn = `<button
+                              id="remove-calendar-btn"
+                              class="ps-4 pe-4 pt-1 pb-1 main-color-background btn mb-3"
+                              type="button"
+                            >
+                              Remove date range
+                          </button>`;
+
+        $("#remove-placeholder").append(removeBtn);
+
+        $("#remove-calendar-btn").click(function () {
+          calendarInd = Math.max(0, calendarInd - 1);
+          $(`#blackoutDate${calendarInd}Container`).remove();
+          if ($("#additional-dates-container").children().length == 0) {
+            $("#remove-calendar-btn").remove();
+          }
+        });
+      }
+
+      // keep track of number of calendars created
+      calendarInd++;
+    });
+    /*
+    *  	MultiSelect.js
+    *  	A small library to manage multiple select tags in forms
+    *
+    *	Carlos Martínez 2019
+    *	my github: https://github.com/carlosEdua
+    *
+    *	repo code: https://github.com/carlosEdua/multiSelect.js
+    *	License: ( MIT ) https://github.com/carlosEdua/multiSelect.js/blob/master/LICENSE
+    *
+    *	You can modify the code and make it better, send me a pull request
+    */
+
+
+    class MultiSelect{
+      constructor({ pleaseSelectOptionValue = '' }){
+        // get the multiSelect container
+        this.multiSelectContainer = document.querySelector('[multiSelect]');
+        // the tipical <option value=""> please select a option <option/>
+        this.pleaseSelectOptionValue = pleaseSelectOptionValue;
+        // get all the posible inputs in a <form/> tag
+        this.allInputs = [...this.multiSelectContainer.querySelectorAll('input')];
+        this.allSelects = [...this.multiSelectContainer.querySelectorAll('select')];
+        this.allTextArea = [...this.multiSelectContainer.querySelectorAll('textarea')];
+        // add onchange listener to all <select/>
+        this.addSelectListeners(this.allSelects);
+      }
+
+      // ========== add listener to <select/> ==========
+      addSelectListeners(selectHTMLElements){
+        // agregar eventListener a todos los <select />
+        selectHTMLElements.map( select => select.addEventListener('change', (ev) => this.showHideIt(ev)) );
+      }
+
+      // ========== show/hide logic ==========
+      showHideIt(ev){
+        const { multiSelectContainer, pleaseSelectOptionValue } = this;
+        const select = ev.target;
+        const selectValue = select.value;
+        // if the <option/> is not the "please select a option" with value=""
+        if(
+          // check if isn't invalid value
+          selectValue!== pleaseSelectOptionValue
+          &&
+          // check if the parent has a 'visibleId' attribute
+          select.parentElement.getAttribute('visibleId')
+          &&
+          // check if the option has the 'makeVisible' attribute
+          select.querySelector(`option[value=${selectValue}]`).getAttribute('makeVisible')
+        ){
+          // get the makeVisible attribute of <option/>
+          const makeVisible = select.querySelector(`option[value=${selectValue}]`).getAttribute('makeVisible');
+          // get the visibleId of the <select/> container
+          const parentVisibleId = select.parentElement.getAttribute("visibleId");
+          // buscar la <section/> padre de los select y ocultar todos los hijos
+          // para luego solo mostrar el deseado
+          const parent = multiSelectContainer.querySelector(`[parent=${parentVisibleId}]`);
+          // ocultar hijos
+          [...parent.children].map( child => child.style.display = "none" );
+          // hacer parent visible
+          parent.style.display = "block";
+          // mostrar solo el hijo deseado
+          parent.querySelector(`div[visibleId=${makeVisible}]`).style.display = "flex";
+        }
+        // you select the default "please select a option" <option/>
+        else{
+          try{
+            let dependChilds = select.parentElement.getAttribute('visibleId');
+            // hide all the childs
+            document.querySelector(`[parent=${dependChilds}]`).style.display = "none";
+          }
+          // the <select/> is a simple select
+          catch(err){
+            console.warn('warning: an "error" ocurred because the <select> is a simple normal <select> \n' +
+              'don\'t worry, this warning is not important\n' +
+              'The VALUE is ' + selectValue + '\n' +
+              'The "ERROR" is: ' + err + '\n'
+            );
+          }
+        }
+
+      }
+
+      // ========== get all the values in form, like inputs, selects and textareas ==========
+      getJson( ofAll = true) {
+        // save all the values here
+        let jsonValues = {};
+        // class variables and methods
+        let {
+            getVisibleItems,
+            iterateValues,
+            allSelects,
+            allInputs,
+            allTextArea
+          } = this;
+        // variable for save only the visible items
+        let visibleItems;
+
+        if(allSelects.length > 0){
+          visibleItems = getVisibleItems(allSelects);
+          iterateValues(jsonValues, visibleItems);
+        }
+        // if you want all the inputs and textareas values or only the <select> values
+        if(ofAll){
+          // check if a input exist in form
+          if(allInputs.length > 0){
+            visibleItems = getVisibleItems(allInputs);
+            iterateValues(jsonValues, visibleItems);
+          }
+
+
+          if(allTextArea.length > 0){
+            visibleItems = getVisibleItems(allTextArea);
+            iterateValues(jsonValues, visibleItems);
+          }
+        }
+
+        return jsonValues;
+
+      }
+
+      // ========== get only the visible inputs, selects and texareas ==========
+      getVisibleItems(elementsArray) {
+        let items = [];
+        for(let item of elementsArray){
+          if(item.getBoundingClientRect().height > 0) items.push(item);
+        }
+        return items;
+      }
+
+      // ========== iterate in the visible items and get the value ==========
+      iterateValues(obj, elementsArray) {
+        for( let elmt of elementsArray){
+          let name = elmt.name;
+          let value = elmt.value;
+          // add value to object
+          obj[name] = value;
+        }
+      }
+
+      // ========== simple valiation of all the <select> values ==========
+      // check if it is not the typical value of 'select an option'
+      // each selected item should have a valid value, not <<please select an option>>
+      simpleValidate(){
+        let isValid = true;
+        let invalidValues = [];
+        let visibleSelects = this.getVisibleItems(this.allSelects);
+        // iterate and check if a select has the >>>pleaseSelectOptionValue<<<
+        for( let select of visibleSelects ){
+          if(select.value === this.pleaseSelectOptionValue){
+            invalidValues.push(select);
+          }
+        }
+        //
+        if(invalidValues.length > 0){
+          console.warn('one or more <select> tag has a not valid value', 'there are: \n');
+          invalidValues.forEach( (select, index) => {
+            console.log(`===== ${index} =====`);
+            console.warn('the select element: ', select, ' has not a valid value: ', select.value);
+          })
+          isValid = false;
+        }
+
+        return isValid;
+      }
+
+    }
+
+    // check if is nodejs and export
+    typeof module === 'undefined' ? null :
+    typeof module.exports === 'undefined' ? null :
+    module.exports = MultiSelect;
+  });
+
+  const descField = $("#inputDesc");
+  const charCount = $("#charCount");
+
+  descField.keyup(updateCount);
+  descField.keydown(updateCount);
+
+  function updateCount() {
+    const cs = $(this).val().length;
+    charCount.text(`${cs}/300`);
+    if (cs == 300) {
+      charCount.css('color', 'red');
+    }
+    else {
+      charCount.css('color', 'grey');
+    }
+  }
+</script>
+
+<script>
+  function readURL1(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#imagePrimary').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+        var element = document.getElementById("imageRow");
+        element.classList.remove("d-none");
+    }
+
+}
+function readURL2(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#imageSecondary').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+        var element = document.getElementById("imageRow");
+        element.classList.remove("d-none");
+    }
+
+}
+
+  $("#primaryImageFile").change(function(){
+      readURL1(this);
+  });
+  $("#additionalImages").change(function(){
+      readURL2(this);
+  });
+</script>
+<script src="{{url_for('static', filename='form.js')}}"></script>
+

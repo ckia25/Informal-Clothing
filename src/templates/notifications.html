@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    {% if logged_in %}
+    {% include 'logged-in-header.html' %}
+    {% else %}
+    {% include 'guest-header.html' %}
+    {% endif %}
+    <div>
+      <div class="standard-div-margins
+        ms-2 ms-sm-5
+        me-2 me-sm-5 mb-0 pb-0" >
+      <!-- page title div -->
+        <div class="mt-3
+          mb-md-2 mb-sm-0
+          ms-sm-0 ms-3
+          me-sm-0 me-3">
+          <h1>Notifications</h1>
+          <hr />
+        </div>
+      </div>
+      <div class="container-fluid">
+        <div class="row standard-div-margins">
+          <div class="col-lg-6" style=" margin-bottom: auto;">
+            <h3>
+                <a href="/lending">
+                    Lending
+                </a>
+            </h3>
+
+            {% if lender_notifications == [] %}
+                <p>No lender notifications</p>
+            {% endif %}
+            {% for i, lender_notif in enumerate(lender_notifications) %}
+                <a href="/lending">
+                    <div class="notification-ui_dd-content">
+                        <div class="notification-list notification-lending-list--unread">
+                            <div class="notification-list_content">
+                                <div class="notification-list_img pb-2">
+                                  {% if lender_notif.get_headshot() %}
+                                  <img src="{{lender_notif.get_headshot()}}" id="idImage" alt="ProfilePic">
+                                  {% else %}
+                                  <i class="bi bi-person-circle" style="font-size: 40px;"></i>
+                                  {% endif %}
+                                </div>
+                                <div class="notification-list_detail">
+                                    {% if lender_notif.get_notif_type() == 'Borrow request' %}
+                                        <p><b>{{lender_notif.get_borrower_username()}}</b> requested to borrow from you</p>
+                                    {% elif lender_notif.get_notif_type() == 'Borrower received item' %}
+                                        <p><b>{{lender_notif.get_borrower_username()}}</b> received your item</p>
+                                    {% elif lender_notif.get_notif_type() == 'Borrower returned item' %}
+                                        <p><b>{{lender_notif.get_borrower_username()}}</b> returned your item</p>
+                                    {% elif lender_notif.get_notif_type() == 'Item back on market' %}
+                                        <p>Your item is back on the market</p>
+                                    {% endif %}
+
+                                    <div class="text-muted d-flex justify-content-between"><small class="me-1">{{lender_notif.get_date_created()}}</small><small>{{ minutes_since_timestamp(lender_notif.get_time_created(), lender_notif.get_date_created()) }}</small></div>
+                                    {% if lender_notif.get_msg() %}
+                                      <p class="text-muted mt-2">Their message: {{lender_notif.get_msg()}}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="notification-list_feature-img">
+                                <img src="{{lender_notif.get_img_url()}}" alt="Feature image">
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+          </div>
+          <div class="col-lg-6" style=" margin-bottom: auto;">
+              <h3>
+                <a href="/borrowing">
+                    Borrowing
+                </a>
+              </h3>
+                {% if borrower_notifications == [] %}
+                    <p>No borrower notifications</p>
+                {% endif %}
+                {% for i, borrower_notif in enumerate(borrower_notifications) %}
+                    {% if borrower_notif.get_notif_type() != 'Item back on market' %}
+                        <a href="/borrowing">
+                            <div class="notification-ui_dd-content">
+                              <div class="notification-list notification-borrowing-list--unread">
+                                <div class="notification-list_content">
+                                    <div class="notification-list_img pb-2">
+                                      {% if borrower_notif.get_headshot() %}
+                                      <img src="{{borrower_notif.get_headshot()}}" id="idImage" alt="ProfilePic">
+                                      {% else %}
+                                      <i class="bi bi-person-circle" style="font-size: 40px;"></i>
+                                      {% endif %}
+                                    </div>
+                                    <div class="notification-list_detail">
+                                        {% if borrower_notif.get_notif_type() == 'Borrow request' %}
+                                            <p>You requested to borrow from <b>{{borrower_notif.get_lender_username()}}</b></p>
+                                        {% elif borrower_notif.get_notif_type() == 'Borrow request approved' %}
+                                            <p><b>{{borrower_notif.get_lender_username()}}</b> approved your borrow request</p>
+                                        {% endif %}
+                                        <div class="text-muted d-flex justify-content-between"><small class="me-1">{{borrower_notif.get_date_created()}}</small><small class="ms-3">{{ minutes_since_timestamp(borrower_notif.get_time_created(), borrower_notif.get_date_created()) }}</small></div>
+                                        {% if borrower_notif.get_msg() %}
+                                          <p class="text-muted mt-2">Your message: {{borrower_notif.get_msg()}}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="notification-list_feature-img">
+                                  <img src="{{borrower_notif.get_img_url()}}" alt="Feature image">
+                                </div>
+                              </div>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+          </div>
+        </div>
+    </div>
+    </div>
+
+    {% include 'listing-button.html' %}
+  </body>
+</html>

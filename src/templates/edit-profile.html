@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="{{url_for('static', filename='form.js')}}"></script>
+  </head>
+  <body>
+    {% if username %} {% include 'logged-in-header.html' %} {% else %} {%
+    include 'guest-header.html' %} {% endif %}
+
+    <!-- "Title" div -->
+    <div class="container-xl mt-4 px-5 text-center text-sm-start">
+      <h1>Edit Profile</h1>
+    </div>
+    <hr />
+    <form
+      id="listing-form"
+      class="needs-validation"
+      action="/profile/{{username}}/edit/submit"
+      method="post"
+      enctype="multipart/form-data"
+      novalidate
+    >
+      <div class="container-xl mt-4 px-5">
+        <div class="row">
+          <div class="col-xl-4">
+              <!-- Profile picture card-->
+              <div class="card mb-4 mb-xl-0">
+                    <div class="card-header">Profile Picture</div>
+                    <div class="card-body text-center">
+                      <!-- Profile picture image-->
+                      {% if user.get_headshot() %}
+                      <img src="{{user.get_headshot()}}" id="idImage" alt="ProfilePic"
+                      class="rounded-circle img-fluid" style="width: 190px; height: 190px; object-fit: cover;">
+                      {% else %}
+                      <img src="https://cdn.onlinewebfonts.com/svg/img_568656.png" id="idImage" alt="ProfilePic"
+                      class="rounded-circle img-fluid" style="width: 190px; height: 190px; object-fit: cover;">
+                      {% endif %}
+                      <!-- Profile picture help block-->
+                      <div class="small font-italic text-muted mb-4">Upload a profile picture!</div>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="primaryImageFile"
+                        accept="image/*"
+                        name="headshot"
+                      />
+                    </div>
+              </div>
+          </div>
+          <div class="col-xl-8">
+              <!-- Account details card-->
+              <div class="card mb-4">
+                    <div class="card-header">Account Details</div>
+                    <div class="card-body">
+                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                          <!-- Form Row-->
+                          <div class="row gx-3 mb-3">
+                                <!-- Form Group (first name)-->
+                                <div class="col-md-6">
+                                  <label class="small mb-1" for="inputFirstName">First name*</label>
+                                  <input
+                                  class="form-control"
+                                  id="inputFirstName"
+                                  type="text"
+                                  placeholder="Enter your first name"
+                                  aria-describedby="first name"
+                                  name="first_name"
+                                  maxlength="{{constants.inputLimits.NAME_LIMIT.value}}"
+                                  value="{{user.get_first_name() if user.get_first_name()}}"
+                                  required>
+                                </div>
+                                <!-- Form Group (last name)-->
+                                <div class="col-md-6">
+                                  <label class="small mb-1" for="inputLastName">Last name*</label>
+                                  <input
+                                  class="form-control"
+                                  id="inputLastName"
+                                  type="text"
+                                  placeholder="Enter your last name"
+                                  aria-describedby="last name"
+                                  name="last_name"
+                                  maxlength="{{constants.inputLimits.NAME_LIMIT.value}}"
+                                  value="{{user.get_last_name() if user.get_last_name()}}"
+                                  required>
+                                </div>
+                          </div>
+                          <!-- Form Row -->
+                          <div class="row gx-3 mb-3">
+                                <!-- Form Group (Email)-->
+                                <div class="col-md-6">
+                                  <label class="small mb-1" for="inputOrgName">Email</label>
+                                  <input
+                                  class="form-control"
+                                  id="inputOrgName"
+                                  type="email"
+                                  placeholder="Email Address"
+                                  value="{{username}}@princeton.edu"
+                                  name="email"
+                                  disabled="disabled"
+                                  readonly>
+                                </div>
+                                <!-- Form Group (Phone Number)-->
+                                <div class="col-md-6">
+                                  <label class="small mb-1" for="inputPhoneNumber">Phone number
+                                  </label>
+                                  <input
+                                  class="form-control"
+                                  id="inputPhoneNumber"
+                                  type="tel"
+                                  name="phone_number"
+                                  pattern="^\(\d{3}\) \d{3}-\d{4}$"
+                                  value="{{user.get_phone_number() if user.get_phone_number()}}"
+                                  placeholder="(XXX) XXX-XXXX" oninput="formatPhone(this)">
+                                </div>
+                                <div class="invalid-feedback">Please provide a phone number of the form: 123-456-7890.</div>
+                          </div>
+                          <!-- Form Group (Bio)-->
+                          <div class="mb-3">
+                            <label for="description" class="form-label"
+                            >A short bio</label
+                            >
+                            <textarea
+                            rows="10"
+                            type="text"
+                            name="bio"
+                            class="form-control"
+                            id="inputDesc"
+                            aria-describedby="inputDesc"
+                            placeholder="Tell us about yourself..."
+                            maxlength="{{constants.inputLimits.BIO_LIMIT.value}}"
+                            >{{user.get_bio() if user.get_bio()}}</textarea>
+                          </div>
+                          <!-- Save changes button-->
+                          <div class="float-end">
+                            <button type="submit" id="submitButton" class="btn btn-secondary green-background">
+                              Save profile
+                            </button>
+                          </div>
+
+                        <div class="float-end me-2">
+                            <a class="btn btn-secondary heather-button" type="button"
+                            href="/profile/{{username}}" onclick="location.href = document.referrer; return false;"> Cancel
+                            </a>
+                        </div>
+                        <div id=spinner class="float-end mb-4 me-2"></div>
+                    </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+
+  </body>
+</html>
+
+<!-- Include Required Prerequisites -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+></script>
+<!-- Include Date Range Picker -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"
+></script>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css"
+/>
+<script>
+  'use strict'
+  let count = 0;
+
+  function addSpinner() {
+    let str = '<div class="clearfix"><div class="spinner-border float-end" role="status"><span class="sr-only"></span></div></div>';
+    $("#spinner").html(str);
+  }
+
+  function setup(){
+    const form = document.getElementById("listing-form");
+    if (!form) return;
+    form.addEventListener("submit", (event) => {
+      // setAllAdditionalFiles();
+      const btn = document.getElementById("submitButton");
+      if (count == 0){
+        count++;
+        btn.disabled=true;
+        btn.classList.add("disabled");
+        addSpinner();
+      } else {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }, false);
+  }
+  $('document').ready(setup);
+</script>
+
+<script>
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#idImage').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+  $("#primaryImageFile").change(function(){
+      readURL(this);
+  });
+
+  function formatPhone(phoneInput) {
+    // Remove all non-numeric characters from the input
+    const input = phoneInput.value.replace(/\D/g, "");
+
+    // Format the phone number based on the number of digits entered
+    let formattedPhone = "";
+    if (input.length == 0) {
+      formattedPhone = `${input}`;
+    }
+    else if (input.length < 4) {
+      formattedPhone = `(${input}`;
+    } else if (input.length < 7) {
+      formattedPhone = `(${input.slice(0, 3)}) ${input.slice(3)}`;
+    } else {
+      formattedPhone = `(${input.slice(0, 3)}) ${input.slice(3, 6)}-${input.slice(6, 10)}`;
+    }
+
+    // Update the input value with the formatted phone number
+    phoneInput.value = formattedPhone;
+  }
+
+</script>

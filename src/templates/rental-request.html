@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" href="/static/favicon.ico">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rental Request - inFormal Clothing</title>
+  <!-- Latest compiled and minified CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+    integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+  include 'guest-header.html' %} {% endif %}
+  <div class="standard-div-margins">
+    <!-- "All" div -->
+    <div class="mt-3
+      mb-md-1 mb-sm-0
+      ms-sm-0 ms-3
+      me-sm-0 me-3">
+      <h1>Rental Request</h1>
+      <hr />
+    </div>
+
+    {% if listing %}
+    <div class="container-fluid d-md-flex justify-content-center">
+      <div class="col-md-2 shadow rounded request-details pb-3 pt-3 me-md-5">
+        <div class="container d-flex justify-content-between align-items-center">
+          <div style="min-width: 25px; max-width: 100px">
+            <img src="{{listing.get_images()[0].get_img_url()}}" alt="" class="img-fluid rounded" />
+          </div>
+          <div class="overflow-auto" style="font-weight: bold">
+            {{listing.get_name()}}
+          </div>
+        </div>
+        <div class="container">
+          <hr />
+          <div class="row pb-3 text-center">
+            <div style="font-weight: bold">
+              <a class="nav-link" href="/profile/{{from_username}}">{{from_username}}</a>
+            </div>
+            <div>
+              <!-- Button trigger modal -->
+              <div data-bs-toggle="modal" data-bs-target="#lenderHistoryModal" style="cursor: pointer">
+                <span class="me-2" id="avg_rating_container"></span><span id="num_ratings">({{count}})</span>
+              </div>
+
+              {% include 'ratinghistorymodal.html' %}
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <span
+              data-bs-toggle="popover"
+              data-bs-trigger="hover focus"
+              tabindex="0"
+              class="fw-bold"
+              data-bs-content="Click for pricing information!">
+                <button
+                  class="naked bg-transparent"
+                  data-bs-toggle="modal"
+                  data-bs-target="#priceModal">
+                  points/day <i class="bi bi-question-circle-fill"></i> :
+                </button>
+              </span>
+              <div class="modal fade"
+                id="priceModal"
+                tabindex="-1"
+                aria-labelledby="priceModal"
+                aria-hidden="true"
+                style="z-index: 2500"
+              >
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">Pricing:</h1>
+                    </div>
+                    <div class="modal-body" style="font-size: 1.5rem;">
+                      If you request this listing, you'll be <b>charged temporarily</b> for the
+                      <span class="fw-bold fst-italic">number of days X the listing price
+                      </span>
+                      <ol type="1">
+                        <li>1. The lender can approve your request or deny it.</li>
+                        <li>2. If they approve your request, then the exchange begins.</li>
+                        <li>3. If they deny your request, then your points are <b>refunded</b>!</li>
+                      </ol>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4 text-end">{{listing.get_price()}}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col">subcategory:</div>
+            <div class="col text-end">{{listing.get_subcategory()}}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col">size:</div>
+            <div class="col text-end">{{listing.get_size()}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-md-6 col-xl-9">
+        <form id="rental-request-form" class="needs-validation" action={{'/rentalrequest/submit?listingid=%s&uid=%s' %
+          (listing.get_id(), user_id)}} method="post" enctype="multipart/form-data" novalidate>
+          <div class="d-flex align-items-center justify-content-center justify-content-md-start mt-4 mt-md-0 mb-5">
+            <i id="calendarIcon" class="bi bi-calendar-event me-4" style="font-size: 2rem; color: #6d579a"></i>
+            <div id="loadingCalendar"></div>
+            <div class="container" id="datepicker"></div>
+          </div>
+
+          <div>
+            <textarea class="form-control mb-5 shadow" rows="4" maxlength="{{constants.inputLimits.RENTAL_MSG_LIMIT.value}}" placeholder="Leave a message..."
+              name="request_msg"></textarea>
+          </div>
+          <button type="submit" class="btn btn-secondary green-btn mb-3 float-end"
+          style="float: right;" id="submit-rental-request">
+            Request
+          </button>
+          <a class="btn btn-secondary heather-button me-2" type="button" href="#"
+            onclick="location.href = document.referrer; return false;" style="float: right; width: 75px;"> Cancel
+          </a>
+          <div id=spinnerSubmit class="float-end mb-4 me-2"></div>
+          <input type="hidden" id="rentRequestDate" name="rentRequestDate" />
+          <input type="hidden" id="listing_id" value="{{listing.get_id()}}" />
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        </form>
+      </div>
+      {% else %}
+      <div class="container-fluid d-flex justify-content-center">
+        <div style="font-size: 40px">
+          Oops! Couldn't find that listing...
+          <a href="/" class="text-decoration-underline">Go home?</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if modal == 'not_enough_money' %}
+    {% include 'insufficient_balance.html' %}
+    {% endif %}
+</body>
+
+</html>
+
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+<script>
+  "use strict";
+  let counter = 0;
+
+  function addSpinnerSubmit() {
+    let str = '<div class="clearfix"><div class="spinner-border float-end" role="status"><span class="sr-only"></span></div></div>';
+    $("#spinnerSubmit").html(str);
+  }
+
+  $(document).ready(() => {
+    $('[data-toggle="tooltip"]').tooltip()
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+
+    //Prevent submit spam
+    const form = document.getElementById("rental-request-form");
+    if (!form) return;
+    form.addEventListener("submit", (event) => {
+      // setAllAdditionalFiles();
+      var btn = document.getElementById("submit-rental-request");
+      if (counter == 0) {
+        counter++;
+        btn.disabled = true;
+        btn.classList.add("disabled");
+        addSpinnerSubmit()
+      } else {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }, false);
+
+
+
+
+    // Create an empty array to store your <i> tags
+    let icons = [];
+    let avg_rating = {{ avg_rating | tojson
+  }};
+  let count = {{ count | tojson }};
+
+  // create star elements for user rating
+  for (let i = 1; i <= 5; i++) {
+    let icon;
+    if (i <= avg_rating) {
+      icon = $("<i>", { "class": "bi bi-star-fill" });
+    }
+    else {
+      icon = $("<i>", { "class": "bi bi-star" });
+    }
+    icons.push(icon);
+  }
+
+  // Append the array of <i> tags to a parent element in the DOM
+  $("#avg_rating_container").append(icons);
+
+  function renderCalendar(response) {
+    $('#datepicker').html(response)
+    // remove spinner
+    $("#loadingCalendar").html('');
+  }
+
+  function addSpinner() {
+    let str = '<div class="spinner-border text-dark" role="status"> <span class="sr-only"></span></div>';
+    $("#loadingCalendar").html(str);
+  }
+
+  let request = null;
+
+  if (request != null) {
+    request.abort();
+  }
+
+  window.onload = () => {
+    // load modal for invalid listing creation
+    const newListingPageModal = new bootstrap.Modal("#insufficientBalance");
+    newListingPageModal.show();
+  };
+
+  addSpinner();
+  request = $.ajax(
+    {
+      type: 'GET',
+      url: '/rentalrequest/getunavailabledates?listingid=' + {{ listing_id | tojson}},
+    success: renderCalendar
+      }
+  );
+
+  let today = new Date();
+  const offset = today.getTimezoneOffset();
+  today = new Date(today.getTime() - offset * 60 * 1000);
+  today = today.toISOString().split("T")[0];
+  $('#rentRequestDate').val(today);
+});
+
+</script>

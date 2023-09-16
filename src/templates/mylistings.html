@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" href="/static/favicon.ico">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Listings - inFormal Clothing</title>
+  <!-- Latest compiled and minified CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+    integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+    crossorigin="anonymous"></script>
+  <script src="{{url_for('static', filename='modal.js')}}"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  {% include 'logged-in-header.html' %}
+  <div class="container-fluid d-flex pb-5">
+    <!--Vertical navbar-->
+    <ul class="nav listings-navbar flex-column mt-5 ms-2 col-2 gap-3">
+      <li class="nav-item">
+        <div class="input-group mb-3 search-bar p-3">
+          <span class="input-group-text d-none d-md-block">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text" class="form-control" placeholder="search" aria-label="search-bar"
+            aria-describedby="search-bar" />
+        </div>
+      </li>
+      <li class="form-check ms-1 ms-md-4 d-flex align-items-center">
+        <input class="form-check-input big-checkbox available-checkbox" type="checkbox" value="" id="flexCheckMale" />
+        <label class="form-check-label nav-filter-title ps-3" for="flexCheckMale">available</label>
+      </li>
+      <li class="form-check ms-1 ms-md-4 d-flex align-items-center">
+        <input class="form-check-input big-checkbox out-checkbox" type="checkbox" value="" id="flexCheckFemale" />
+        <label class="form-check-label nav-filter-title ps-3" for="flexCheckFemale">
+          out
+        </label>
+      </li>
+      <li class="form-check ms-1 ms-md-4 d-flex align-items-center">
+        <input class="form-check-input big-checkbox liked-checkbox" type="checkbox" value="" id="flexCheckOther" />
+        <label class="form-check-label nav-filter-title ps-3" for="flexCheckOther">
+          liked
+        </label>
+      </li>
+      <li>
+        <div class="container">
+          <h1 class="nav-filter-title ps-md-4 mt-4 mb-4" for="flexCheckOther">
+            filter + sort
+          </h1>
+          <ul class="row gy-3">
+            <li><a>tops</a></li>
+            <li><a>bottoms</a></li>
+            <li><a>shoes</a></li>
+            <li><a>accessories</a></li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <a data-bs-toggle="collapse" href="#sizeCollapse" role="button" aria-expanded="false"
+          aria-controls="sizeCollapse" class="d-flex align-items-center mx-3">
+          <i class="bi bi-caret-down-fill" style="color: #8d5fea; font-size: 1.5em"></i>
+          <span class="nav-filter-title ms-2">size</span>
+        </a>
+        <div class="collapse" id="sizeCollapse">
+          <div class="listings-navbar">
+            Anim pariatur cliche reprehenderit, enim eiusmod high life
+            accusamus terry richardson ad squid. Nihil anim keffiyeh
+            helvetica, craft beer labore wes anderson cred nesciunt sapiente
+            ea proident.
+          </div>
+        </div>
+      </li>
+      <li>
+        <a data-bs-toggle="collapse" href="#colorCollapse" role="button" aria-expanded="false"
+          aria-controls="colorCollapse" class="d-flex align-items-center mx-3">
+          <i class="bi bi-caret-down-fill" style="color: #8d5fea; font-size: 1.5em"></i>
+          <span class="nav-filter-title ms-2">color</span>
+        </a>
+        <div class="collapse" id="colorCollapse">
+          <div class="listings-navbar">
+            Anim pariatur cliche reprehenderit, enim eiusmod high life
+            accusamus terry richardson ad squid. Nihil anim keffiyeh
+            helvetica, craft beer labore wes anderson cred nesciunt sapiente
+            ea proident.
+          </div>
+        </div>
+      </li>
+      <li>
+        <a data-bs-toggle="collapse" href="#pointsCollapse" role="button" aria-expanded="false"
+          aria-controls="pointsCollapse" class="d-flex align-items-center mx-3">
+          <i class="bi bi-caret-down-fill" style="color: #8d5fea; font-size: 1.5em"></i>
+          <span class="nav-filter-title ms-2">points</span>
+        </a>
+        <div class="collapse" id="pointsCollapse">
+          <div class="listings-navbar">
+            Anim pariatur cliche reprehenderit, enim eiusmod high life
+            accusamus terry richardson ad squid. Nihil anim keffiyeh
+            helvetica, craft beer labore wes anderson cred nesciunt sapiente
+            ea proident.
+          </div>
+        </div>
+      </li>
+    </ul>
+    <!--Cards container-->
+    <div class="container-fluid">
+      <div class="m-5">
+        <h1>My Listings</h1>
+        <hr />
+      </div>
+      <div class="row row-cols-1 row-cols-/lg-2 row-cols-xl-3 g-5 ms-3">
+        {% for i, listing in enumerate(listings) %}
+        <div class="col">
+          <button class="card naked" type="button" data-bs-toggle="modal" data-bs-target="#listing_no_{{listing.get_id()}}">
+            <div class="card">
+              <div class=" d-flex justify-content-center align-items-center">
+                <img src="{{listing.get_images()[0].get_img_url()}}" class="img-fluid" alt="{{listing.get_name()}}" />
+              </div>
+              <div class="card-footer">
+                <h4 class="card-title text-center">{{listing.get_name()}}</h4>
+                <div class="listing-card-text d-flex justify-content-between">
+                  <div class="listing-card-text">size: {{listing.get_size()}}</div>
+                  <div class="listing-card-text">price: {{listing.get_price()}}</div>
+                </div>
+              </div>
+            </div>
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="listing_no_{{listing.get_id()}}" tabindex="-1" aria-labelledby="detailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header main-color-background">
+                  <h5 class="modal-title text-center" id="detailsModalLabel">{{listing.get_name()}}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <img src="{{listing.get_images()[0].get_img_url()}}" class="img-fluid " alt="{{listing.get_name()}}" />
+                  <div class="container-fluid text-start main-color-background p-3">
+                    <div class="row">
+                      <div class="col mb-2">
+                        <span style="font-weight: 600;">Points:</span> {{listing.get_price()}}
+                      </div>
+                      <div class="col mb-2">
+                        <span style="font-weight: bolder;">Poster:</span> username
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col mb-2">
+                        <span style="font-weight: bolder;">Subcategory:</span> {{listing.get_subcategory()}}
+                      </div>
+                      <div class="col mb-2">
+                        <span style="font-weight: bolder;">Size:</span> {{listing.get_size()}}
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col mb-2">
+                        <span style="font-weight: bolder;">Item Quality:</span> Must put in DB
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col mb-4" style="width: 100%; word-wrap: break-word;">
+                      <span style="font-weight: bolder;">Description:</span> {{listing.get_description()}}
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-evenly mb-2">
+                      <button class="btn btn-secondary heather-button">Availability</button>
+                      <button class="btn btn-secondary heather-button">Contact</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if modal %}
+    {% include 'new-listing-modal.html' %}
+    {% endif %}
+    <a href="/listingform">
+      <div style="position:fixed; right:125px; top:650px">
+        <div class="circle"></div>
+      </div>
+    </a>
+</body>
+
+</html>

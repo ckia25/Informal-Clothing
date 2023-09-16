@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rate User - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/static/style.css" />
+    <!---Get star icons--->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+    include 'guest-header.html' %} {% endif %}
+    <div class="container-fluid mt-3">
+      <h1 id="rated-username" class="text-center">Rate {{user}}</h1>
+      <div class="text-center">
+        {% if headshot %}
+          <img src="{{headshot}}" alt="ProfilePic"
+          class="rounded-circle img-fluid" style="width: 150px;">
+        {% else %}
+          <i class="bi bi-person-circle" style="font-size: 120px;"></i>
+        {% endif %}
+      </div>
+      <div id="rating" class="container text-center" style="font-size: 60px">
+        <i class="bi bi-star" data-rating="1"></i>
+        <i class="bi bi-star" data-rating="2"></i>
+        <i class="bi bi-star" data-rating="3"></i>
+        <i class="bi bi-star" data-rating="4"></i>
+        <i class="bi bi-star" data-rating="5"></i>
+      </div>
+      <div class="container text-center mb-5">
+        <h3>Additional Comments</h3>
+        <textarea
+          rows="6"
+          type="text"
+          name="additional-comments"
+          class="form"
+          id="rating-comments"
+          aria-describedby="rating-comments"
+          style="width: 80%"
+          maxlength="{{constants.inputLimits.RATING_LIMIT.value}}"
+        ></textarea>
+        <div>
+          <div class="float-end me-5">
+            {% if rating_borrower %}
+              <button id="rating-submit" name="lender" class="btn btn-secondary green-btn ">Submit</button>
+            {% else %}
+              <button id="rating-submit" name="borrower" class="btn btn-secondary green-btn  ">Submit</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='rating.js')}}"></script>
+  </body>
+</html>

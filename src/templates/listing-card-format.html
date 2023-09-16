@@ -1,0 +1,184 @@
+<div>
+  <div
+    class="naked shadow rounded-3 bg-transparent p-0
+    ms-sm-0 ms-5
+    me-sm-0 me-5"
+  >
+    <div class="container p-0">
+      <button class="d-flex justify-content-center align-items-center
+      naked bg-transparent ms-0 me-0"
+      type="button"
+      data-bs-toggle="modal"
+      data-bs-target="#listing_no_{{listing.get_id()}}">
+        <img
+        src="{{listing.get_images()[0].get_img_url()}}"
+        class="listings-image rounded-top-3 row img-fluid"
+        alt="{{listing.get_name()}}"
+        />
+      </button>
+      <div class="listing-footer row ms-3 pb-2 pt-1 me-0">
+        <div class="col-6">
+          <b class="row justify-content-start align-items-center text-nowrap">
+          {{listing.get_price()}}
+          {% if listing.get_price() == 1 %}
+          pt/day
+          {% else %}
+          pts/day
+          {% endif %}
+          </b>
+          <div class="row justify-content-start align-items-center">
+          {{listing.get_size()}}
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row justify-content-end align-items-end">
+            {% if listing.get_id() in liked_posts %}
+            <button id="heart{{i}}" name="{{listing.get_id()}}" class="
+            bi bi-bookmark-fill btn btn-lg pe-3 pt-0 mt-0 like-btn"></button>
+            {% else %}
+            <button id="heart{{i}}" name="{{listing.get_id()}}" class="
+            bi bi-bookmark btn btn-lg pe-3 pt-0 mt-0 like-btn"></button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Modal -->
+  <div
+    style="z-index: 2500"
+    class="modal fade"
+    id="listing_no_{{listing.get_id()}}"
+    tabindex="-1"
+    aria-labelledby="detailsModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header main-color-background">
+          <h5 class="modal-title" id="detailsModalLabel" style="font-weight: bolder;">
+            {{listing.get_name()}}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body text-center">
+          <!-- Carousel -->
+          {% if listing.get_images()|length > 1 %}
+          {% include 'image-carousel.html' %}
+          {% else %}
+          <img
+            src="{{listing.get_images()[0].get_img_url()}}"
+            class="modal-image img-fluid rounded-2 mb-3"
+            alt="{{listing.get_name()}}"
+          />
+          {% endif %}
+          <div
+            class="container-fluid text-start main-color-background p-3"
+          >
+            <div class="row">
+              <div class="col mb-2">
+                <span style="font-weight: 600">Points:</span>
+                {{listing.get_price()}}
+              </div>
+              <div class="col mb-2">
+                <span style="font-weight: bolder">Lender:</span>
+                  <a class="btn-link" href="{{ url_for('profile', user_requested=listing.get_poster()) }}">
+                    {{listing.get_poster()}}
+                  </a>
+                </span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-2">
+                <span style="font-weight: bolder">Subcategory:</span>
+                {{listing.get_subcategory()}}
+              </div>
+              <div class="col mb-2">
+                <span style="font-weight: bolder">Size:</span>
+                {{listing.get_size()}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mb-2">
+                <span style="font-weight: bolder">Email:</span>
+                  <a class="btn-link" href="mailto:{{listing.get_poster()}}@princeton.edu">
+                    {{listing.get_poster()}}@princeton.edu
+                  </a>
+                </span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col mb-4" style="width: 100%; word-wrap: break-word;">
+                <span style="font-weight: bolder;">Description:</span>
+                {{listing.get_description()}}
+              </div>
+            </div>
+            <div class="d-flex justify-content-evenly mb-2">
+              <!---For debugging, set ==. For production, SET !=-->
+              {% if user.get_id() != listing.get_user_id() %}
+                <a class="btn-shadow btn heather-button btn-secondary" href="{{ '/rentalrequest?listingid=%s' % listing.get_id() }}"
+                >
+                Borrow</a>
+              {% else %}
+                  <form action="/profile/{{username}}/editlisting" method="get">
+                    <input type="hidden" class="form" name="listingid" value="{{listing.get_id()}}">
+                    <button type="submit" class="btn-shadow btn btn-secondary heather-button" value="Submit">Edit</button>
+                  </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+<script>
+
+  request = null;
+
+  $('#heart{{i}}').click(function(event) {
+
+    if (request != null) {
+      request.abort();
+    }
+
+    $("#heart{{i}}").toggleClass("bi bi-bookmark");
+    $("#heart{{i}}").toggleClass("bi bi-bookmark-fill");
+
+    const listingid = "{{listing.get_id()}}";
+    const userid = "{{user.get_id()}}";
+    const csrf_token = "{{csrf_token()}}";
+
+    request = $.ajax({
+      type: "POST",
+      url: "/likepost",
+      data: {
+        listingid: listingid,
+        userid: userid,
+      },
+      headers: {
+        "X-CSRFToken": csrf_token,
+      }
+    });
+  });
+
+</script>
+
+
+

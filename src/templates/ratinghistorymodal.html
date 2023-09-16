@@ -1,0 +1,143 @@
+<!-- Lender Modal -->
+<div
+  class="modal fade"
+  id="lenderHistoryModal"
+  tabindex="-1"
+  aria-labelledby="lenderHistoryModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ratingHistoryLabel">Rating history</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        {% if lender_ratings|length == 0 %}
+        <div>No lender ratings, yet.</div>
+        {% else %}
+          {% for rating in lender_ratings %}
+          <div class="row align-items-center ms-4">
+            <div class="col">
+              <a href="/profile/{{rating.get_username()}}">
+                {% if rating.get_headshot() %}
+                <img
+                  style="width: 30px; height: auto"
+                  class="img-account-profile rounded-circle mb-2 me-2"
+                  src="{{rating.get_headshot()}}"
+                  alt="profile-pic"
+                />
+                {% else %}
+                  <i class="bi bi-person-circle mb-2 me-2" style="font-size: 30px;"></i>
+                {% endif %}
+                {% if rating.get_first_name() and rating.get_last_name() %}
+                <span
+                  >{{rating.get_first_name()|default('') }} {{rating.get_last_name()|default('') }}</span
+                >
+                {% else %}
+                <span
+                  >{{rating.get_username()}}</span
+                >
+                {% endif %}
+              </a>
+              <div>
+                {% set empty_stars = 5 - rating.get_rating() %} {% for i in
+                range(rating.get_rating()) %}
+                <i class="bi bi-star-fill"></i>
+                {% endfor %} {% for i in range(empty_stars) %}
+                <i class="bi bi-star"></i>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col text-right">{{rating.get_msg()}}</div>
+          </div>
+        {% if rating != lender_ratings[-1] %}
+        <hr />
+        {% endif %} {% endfor %}
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Borrower Modal -->
+<div
+  class="modal fade"
+  id="borrowerHistoryModal"
+  tabindex="-1"
+  aria-labelledby="borrowerHistoryModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ratingHistoryLabel">Rating history</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        {% if borrower_ratings|length == 0 %}
+        <div>No borrower ratings, yet.</div>
+        {% else %}
+        {% for rating in borrower_ratings %}
+        <div class="row align-items-center">
+          <div class="col text-center">
+            <a href="/profile/{{rating.get_username()}}">
+              {% if rating.get_headshot() %}
+                <img
+                  style="width: 30px; height: auto"
+                  class="img-account-profile rounded-circle mb-2 me-2"
+                  src="{{rating.get_headshot()}}"
+                  alt="profile-pic"
+                />
+              {% else %}
+                  <i class="bi bi-person-circle mb-2 me-2" style="font-size: 30px;"></i>
+              {% endif %}
+              {% if rating.get_first_name() and rating.get_last_name() %}
+                <span
+                  >{{rating.get_first_name()|default('') }} {{rating.get_last_name()|default('') }}</span
+                >
+              {% else %}
+                <span
+                  >{{rating.get_username()}}</span
+                >
+              {% endif %}
+            </a>
+            <div>
+              {% set empty_stars = 5 - rating.get_rating() %} {% for i in
+              range(rating.get_rating()) %}
+              <i class="bi bi-star-fill"></i>
+              {% endfor %} {% for i in range(empty_stars) %}
+              <i class="bi bi-star"></i>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col text-right">{{rating.get_msg()}}</div>
+        </div>
+        {% if rating != borrower_ratings[-1] %}
+        <hr />
+        {% endif %} {% endfor %}
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

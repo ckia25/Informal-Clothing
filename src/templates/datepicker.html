@@ -1,0 +1,63 @@
+<input style="width: 225px; min-width: 150px; cursor: pointer" type="text" name="daterange" class="form-control" />
+<!-- Modal -->
+<div class="modal fade" id="badDateModal" aria-labelledby="badDateModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="alert alert-danger" role="alert" id="alertMessage"></div>
+    </div>
+</div>
+<script>
+    const listing_id = {{ listing_id | tojson}}
+    const datePairs = JSON.parse({{ unavailable_dates | tojson }});
+    const today = new Date();
+
+    function getDateObjFromString(dateStr) {
+        const year = dateStr.slice(0, 4);
+        const month = dateStr.slice(5, 7);
+        const day = dateStr.slice(8, 10);
+        return new Date(year, month - 1, day);
+    }
+
+    $(function () {
+        let dayBeforeToday = today;
+        dayBeforeToday.setDate(dayBeforeToday.getDate() - 1);
+        // find first available date for rental
+        $('input[name="daterange"]').daterangepicker({
+            startDate: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+            endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+            isInvalidDate: function (date) {
+                let calendarDate = new Date(date);
+                if (calendarDate < dayBeforeToday) {
+                    return true;
+                }
+
+                for (const pair of datePairs) {
+                    const startDate = getDateObjFromString(pair[0]);
+                    const endDate = getDateObjFromString(pair[1]);
+                    if (calendarDate >= startDate && calendarDate <= endDate) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+        });
+    });
+
+    $('#submit-rental-request').click(function (e) {
+        const dateRange = $('input[name="daterange"]').val().split(' - ');
+        const reqStartDate = new Date(dateRange[0]);
+        const reqEndDate = new Date(dateRange[1]);
+        for (const pair of datePairs) {
+          const startDate = getDateObjFromString(pair[0]);
+          const endDate = getDateObjFromString(pair[1]);
+          if ((startDate >= reqStartDate && startDate <= reqEndDate) |
+            (endDate >= reqStartDate && endDate <= reqEndDate) |
+            reqStartDate < today) {
+            e.preventDefault();
+            const badDateModal = new bootstrap.Modal("#badDateModal");
+            $('#alertMessage').html('This listing is unavailable for the date range you have requested. Please try again.')
+            badDateModal.show();
+            break;
+          }
+        }
+      });
+</script>

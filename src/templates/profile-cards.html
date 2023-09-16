@@ -1,0 +1,9 @@
+{% if listings %}
+    {% for i, listing in enumerate(listings) %}
+      {% include 'profile-card-format.html' %}
+    {% endfor %}   
+{% else %}
+    <div class ="fluid-container offset-md-1 col-md-10">
+    No clothes available.
+    </div>
+{% endif %}

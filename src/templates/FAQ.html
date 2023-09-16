@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" href="/static/favicon.ico">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../static/tshirt_icon.png">
+  <title>
+    FAQs - inFormal Clothing
+  </title>
+  <!-- Latest compiled and minified CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+    integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous">
+  </script>
+  <script src="{{url_for('static', filename='modal.js')}}"></script>
+  <script>
+    document.getElementsByTagName("html")[0].className += " js";
+  </script>
+
+  <link rel="stylesheet" href="/static/faqstyle.css" />
+  <link rel="stylesheet" href="/static/style.scss" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+      include 'guest-header.html' %} {% endif %}
+  <div class="container max-width-md">
+    <h1 class="mt-4">FAQs</h1>
+    <hr class="pb-0">
+    <section class="cd-faq js-cd-faq margin-bottom-lg">
+      <ul class="cd-faq__categories">
+        <li><a class="cd-faq__category truncate" href="#general">General</a></li>
+        <li><a class="cd-faq__category truncate" href="#points">Our Point System</a></li>
+        <li><a class="cd-faq__category truncate" href="#borrowing">Borrowing</a></li>
+        <li><a class="cd-faq__category truncate" href="#lending">Lending</a></li>
+        <li><a class="cd-faq__category truncate" href="#privacy">Privacy</a></li>
+      </ul>
+      <div class="cd-faq__items">
+        <ul id="general" class="cd-faq__group">
+          <li class="cd-faq__title">
+            <h2>General</h2>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What is inFormal?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>inFormal is a peer-to-peer clothing lending platform for Princeton students.</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What can I do with inFormal?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>You can lend out your clothing, and borrowing clothing from other users!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>Why was inFormal created?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>We wanted to give Princeton students a way to expand their wardrobe, and reduce their carbon footprint!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>Who created inFormal?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Brandon Cheng, Caiden Kiani, Jacob Santelli, Katie Heller, and Matt Drapkin!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What's next for inFormal?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>We are hoping to apply to become a TigerApp, so stay tuned!</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul id="points" class="cd-faq__group">
+          <li class="cd-faq__title">
+            <h2 id="pointsection">Our Point System</h2>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What are points?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Points are inFormal's currency!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What can I use points for?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>To rent clothes for some number of points/day!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How many points do users start with?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>500!</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How do I get more points?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>By renting out your clothes! Click <a href="/listingform"> <u>here</u></a> to get started.</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How do I check my balance</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>In your profile! Click <a href="/profile/{{username}}"> <u>here</u></a> to take a look.</p>
+              </div>
+            </div>
+          </li>
+          <li id="pricing" class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How do I price my item?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Here is what we suggest:</p>
+                <table class="table table-striped" style="font-size: 0.75em;">
+                  <thead>
+                    <tr class="fw-bold">
+                      <th scope="col fw-bold" style="font-weight: bold;">Type</th>
+                      <th scope="col fw-bold" style="font-weight: bold;">Price (pts/day)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Dresses</th>
+                      <td>80-100</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Shoes</th>
+                      <td>70-90</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Jacket</th>
+                      <td>60-80</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Sweater</th>
+                      <td>60-80</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Pants</th>
+                      <td>50-70</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Bottoms</th>
+                      <td>50-70</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Tops</th>
+                      <td>40-60</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Sweatshirt</th>
+                      <td>40-60</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Shirt</th>
+                      <td>30-50</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Shorts</th>
+                      <td>30-50</td>
+                    </tr>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul id="borrowing" class="cd-faq__group">
+          <li class="cd-faq__title">
+            <h2>Borrowing</h2>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How do I borrow clothing?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Go to the <a href="/listings"> <u>listings</u></a> page to browse items! </p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>How do borrowing charges work?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>When you request an item worth x pts/day for y days, your account is charged x*y points.
+                <br>
+                <br>
+                  If the lender approves your request, the exchange begins. 
+                  <br><br>If not, the points get refunded!</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul id="lending" class="cd-faq__group">
+          <li class="cd-faq__title">
+            <h2>Lending</h2>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>What happens if an item is overdue?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Please reach out to the student! All users of inFormal are members of the Princeton community, and thus subject to the 
+                  guidelines in <a href="https://rrr.princeton.edu/"> <u>Rights, Rules, and Responsibilities</u></a>!
+                </p>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <ul id="privacy" class="cd-faq__group">
+          <li class="cd-faq__title">
+            <h2>Privacy</h2>
+          </li>
+          <li id="phone" class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>If I add my phone number to my profile, is it public?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>No. Only users who you request to borrow from and users whose requests you approve can see your phone number.</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>Are all ratings public?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Yes. All ratings and ratings messages are public.</p>
+              </div>
+            </div>
+          </li>
+          <li class="cd-faq__item">
+            <a class="cd-faq__trigger" href="#0"><span>Are my bookmarks public?</span></a>
+            <div class="cd-faq__content">
+              <div class="text-component">
+                <p>Yes, the items you bookmark are visible to other users via your profile page.</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      
+      </div>
+     
+      <a href="#0" class="cd-faq__close-panel text-replace">Close</a>
+      <div class="cd-faq__overlay" aria-hidden="true"></div>
+    </section>
+   
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </div>
+  <script src="static/util.js"></script>
+  <script src="static/main.js"></script>
+</body>
+
+</html>

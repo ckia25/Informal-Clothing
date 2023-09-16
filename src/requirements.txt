@@ -1,0 +1,6 @@
+Flask
+SQLAlchemy
+psycopg2
+gunicorn
+cloudinary
+flask_wtf

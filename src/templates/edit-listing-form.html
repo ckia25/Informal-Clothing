@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="/static/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Listing - inFormal Clothing</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="{{url_for('static', filename='editlistingForm.js')}}"></script>
+  </head>
+  <body>
+    {% if logged_in %} {% include 'logged-in-header.html' %} {% else %} {%
+    include 'guest-header.html' %} {% endif %}
+    <!-- Bad date modal -->
+    <div class="modal fade" id="badDateModal" aria-labelledby="badDateModal" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="alert alert-danger" role="alert" id="alertMessage"></div>
+      </div>
+    </div>
+    <form
+      id="listing-form"
+      class="needs-validation"
+      action="/profile/{{username}}/editlisting/submit"
+      method="post"
+      enctype="multipart/form-data"
+      novalidate
+    >
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+      <div class="col container-fluid w-75">
+        <h1 class="mt-4">Edit Listing</h1>
+      </div>
+      <hr />
+      <div class="container w-75">
+
+        <div class="row">
+          <div class="col mb-3">
+            <label for="itemName" class="form-label fw-bold">Item Name*</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              id="itemName"
+              aria-describedby="itemName"
+              value="{{listing.get_name()}}"
+              maxlength="{{constants.inputLimits.TITLE_LIMIT.value}}"
+              required
+            />
+            <div class="invalid-feedback">Please provide an item name.</div>
+          </div>
+          <div class="col mb-3">
+            <div class="row">
+              <div class="col">
+                <label for="blackoutDates" class="form-label"
+                  >Blackout Dates</label
+                >
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col mb-2 mb-lg-0">
+                <button
+                  id="add-calendar-btn"
+                  class="ps-4 pe-4 pt-1 pb-1 main-color-background btn mb-3"
+                  type="button"
+                >
+                  Add more dates
+                </button>
+              </div>
+              <div id="remove-placeholder" class="col mb-2"></div>
+            </div>
+            <span id="additional-dates-container"></span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col mb-3">
+            <div>
+              <div>
+                <label class="fw-bold">Category*</label>
+                {% for category in constants.categories%}
+                <div class="form-check ms-4">
+                  {% if listing.get_category() == category.value %}
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="category"
+                    value="{{category.value}}"
+                    id="flexCheck{{category.value.capitalize()}}"
+                    required
+                    checked
+                  />
+                  {% else %}
+                  <input
+                  class="form-check-input"
+                  type="radio"
+                  name="category"
+                  value="{{category.value}}"
+                  id="flexCheck{{category.value.capitalize()}}"
+                  required
+                  />
+                {% endif %}
+                  <label
+                    class="form-check-label"
+                    for="flexCheck{{category.value.capitalize()}}"
+                  >
+                    {{category.value.capitalize()}}
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="invalid-feedback">Please select a category.</div>
+            </div>
+
+            <div class="mt-3">
+              <label for="subcategory" class="form-label fw-bold">Subcategory*</label>
+              <select
+                name="subcategory"
+                class="form-select"
+                aria-label="Select size"
+                required
+              >
+                <option value="" disabled selected>Select</option>
+                {% for subcategory in constants.subcategories %}
+                {% if listing.get_subcategory() == subcategory.value %}
+                <option value="{{subcategory.value}}" selected>
+                  {{subcategory.value.capitalize()}}
+                </option>
+                {% else %}
+                <option value="{{subcategory.value}}">
+                  {{subcategory.value.capitalize()}}
+                </option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">Please select a subcategory.</div>
+            </div>
+
+            <div class="mt-3">
+              <label for="size" class="form-label fw-bold">Size*</label>
+              <select
+                class="form-select"
+                aria-label="Select size"
+                name="size"
+                required
+              >
+                <option value="" disabled>Select</option>
+                {% for size in constants.regular_sizes %}
+                {% if listing.get_size() == size.value %}
+                <option value="{{size.value}}" selected>{{size.value}}</option>
+                {% else %}
+                <option value="{{size.value}}">{{size.value}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">Please provide a size.</div>
+            </div>
+          </div>
+          <div class="col mb-3">
+            <label for="price" class="form-label fw-bold">Price (points/day)*</label>
+            <input
+              type="number"
+              name="price"
+              class="form-control"
+              id="inputItemName"
+              aria-describedby="itemName"
+              value="{{listing.get_price()}}"
+              max="{{constants.defaults.MAX_PRICE.value}}"
+              min="{{constants.defaults.MIN_PRICE.value}}"
+              required
+            />
+            <div class="invalid-feedback">Please provide a whole number less than 100,000.</div>
+
+            <label for="description" class="form-label mt-3"
+              >Short Description</label
+            >
+            <textarea
+              type="text"
+              name="description"
+              class="form-control"
+              id="inputDesc"
+              value="{{listing.get_description()}}"
+              aria-describedby="inputDesc"
+              style="height: 180px;"
+              maxlength="{{constants.inputLimits.DESCRIPTION_LIMIT.value}}"
+            >{{listing.get_description()}}</textarea>
+
+
+
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+
+          </div>
+          <div class="col-sm-6 mb-3">
+
+          </div>
+        </div>
+        <div class="row">
+
+        </div>
+      </div>
+      <hr />
+      <input type="hidden" id="listingDateCreated" name="listingDateCreated" />
+      <input type="hidden" name="listing_id" value="{{listing_id}}" />
+      <div class="float-end me-5 mb-4">
+        <button type="submit" id="submitButton" class="btn btn-secondary green-background">Submit</button>
+      </div>
+    </form>
+    <div class="float-end me-3 mb-4">
+      <a class="btn btn-secondary heather-button" type="button"
+        href="/profile/{{username}}" onclick="location.href = document.referrer; return false;"> Cancel
+      </a>
+    </div>
+    <div id=spinner class="float-end mb-4 me-2"></div>
+  </body>
+</html>
+
+<!-- Include Required Prerequisites -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+></script>
+<!-- Include Date Range Picker -->
+<script
+  type="text/javascript"
+  src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"
+></script>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css"
+/>
+<script>
+  "use strict";
+
+  $(document).ready(function () {
+    let calendarInd = 0;
+    const today = new Date();
+    const datePairs = JSON.parse({{ unavailable_dates | tojson }});
+    let dayBeforeToday = today;
+      dayBeforeToday.setDate(dayBeforeToday.getDate() - 1);
+
+    function getDateObjFromString(dateStr) {
+      const year = dateStr.slice(0, 4);
+      const month = dateStr.slice(5, 7);
+      const day = dateStr.slice(8, 10);
+      return new Date(year, month - 1, day);
+  }
+
+    // create new calendar on button click
+    $("#add-calendar-btn").click(function () {
+      const newDatePicker = `<div id=blackoutDate${calendarInd}Container class="row mb-2">
+                             <div class="col"></div>
+                             <div class="col">
+                              <input
+                              style="width: 225px; min-width: 150px; cursor: pointer;"
+                              type="text"
+                              name="blackoutDate${calendarInd}"
+                              class="form-control"
+                              id="blackoutDate${calendarInd}"
+                              />
+                             </div>
+                            </div>`;
+
+      $("#additional-dates-container").append(newDatePicker);
+
+      // hook up functionality to new calendar
+      $(function () {
+        $(`input[name="blackoutDate${calendarInd}"]`).daterangepicker({
+          startDate: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+          isInvalidDate: function (date) {
+            const calendarDate = new Date(date);
+            if (calendarDate < dayBeforeToday) {
+                return true;
+            }
+
+            for (const pair of datePairs) {
+                const startDate = getDateObjFromString(pair[0]);
+                const endDate = getDateObjFromString(pair[1]);
+                if (calendarDate >= startDate && calendarDate <= endDate) {
+                    return true;
+                }
+            }
+            return false;
+          },
+        });
+      });
+
+      $(`#blackoutDate${calendarInd}`).on('apply.daterangepicker hide.daterangepicker', function(ev, picker) {
+        if (picker.startDate < dayBeforeToday | picker.endDate < dayBeforeToday) {
+          const badDateModal = new bootstrap.Modal("#badDateModal");
+          $('#alertMessage').html('Please select valid blackout dates.')
+          badDateModal.show();
+          $(this).val('');
+        }
+      });
+
+      if ($("#remove-placeholder").children().length == 0) {
+        const removeBtn = `<button
+                              id="remove-calendar-btn"
+                              class="ps-4 pe-4 pt-1 pb-1 main-color-background btn mb-3"
+                              type="button"
+                            >
+                              Remove date range
+                          </button>`;
+
+        $("#remove-placeholder").append(removeBtn);
+
+        $("#remove-calendar-btn").click(function () {
+          calendarInd = Math.max(0, calendarInd - 1);
+          $(`#blackoutDate${calendarInd}Container`).remove();
+          if ($("#additional-dates-container").children().length == 0) {
+            $("#remove-calendar-btn").remove();
+          }
+        });
+      }
+
+      // keep track of number of calendars created
+      calendarInd++;
+    });
+  });
+</script>
